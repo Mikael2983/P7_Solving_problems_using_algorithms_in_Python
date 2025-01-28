@@ -7,7 +7,7 @@ MAX_SPEND = 500
 list_actions = []
 
 
-def extract_actions_from_csv(path:str) -> list:
+def extract_actions_from_csv(path: str) -> list:
     """
     extracts the list of actions and their characteristics from the csv file
     :param path: path to the data file
