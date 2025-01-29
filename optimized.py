@@ -36,29 +36,29 @@ def extract_actions_from_csv(path: str):
     return actions, scale
 
 
-def knapsack(actions, budget_max, scale=1):
+def knapsack(actions, max_budget, scale=1):
     """
-    Résout le problème du sac à dos pour maximiser la rentabilité.
+    Solves the 0/1 knapsack problem to maximize profitability while respecting a budget constraint.
 
-    :param actions: Liste d'objets Action
-    :param budget_max: Budget maximal
-    :param scale: Facteur d'échelle (1 si tous les coûts sont entiers, sinon 100)
-    :return: Rentabilité maximale et liste des actions sélectionnées
+    :param actions: List of Action objects
+    :param max_budget: Maximum budget
+    :param scale: Scaling factor (1 if all costs are integers, otherwise 100 for decimal handling)
+    :return: Maximum achievable profit and the list of selected actions
     """
 
     costs = [int(action.cost * scale) for action in actions]
     profits = [action.cost * action.profitability for action in
                actions]
-    budget_max = int(budget_max * scale)
+    max_budget = int(max_budget * scale)
 
     number_of_actions = len(actions)
-    max_profit_at_budget = [0] * (budget_max + 1)
+    max_profit_at_budget = [0] * (max_budget + 1)
 
     selected = [[False] * number_of_actions for _ in range(
-        budget_max + 1)]  # Tableau pour récupérer les actions choisies
+        max_budget + 1)]  # Tableau pour récupérer les actions choisies
 
     for i in range(number_of_actions):
-        for j in range(budget_max, costs[i] - 1, -1):
+        for j in range(max_budget, costs[i] - 1, -1):
             if max_profit_at_budget[j] < max_profit_at_budget[j - costs[i]] + profits[i]:
                 max_profit_at_budget[j] = max_profit_at_budget[j - costs[i]] + profits[i]
                 selected[j] = selected[j - costs[i]][
@@ -66,9 +66,9 @@ def knapsack(actions, budget_max, scale=1):
                 selected[j][i] = True  # Ajouter l'action actuelle
 
     # Récupération des actions sélectionnées
-    max_profit = max_profit_at_budget[budget_max]
+    max_profit = max_profit_at_budget[max_budget]
     selected_actions = [actions[i] for i in range(number_of_actions) if
-                        selected[budget_max][i]]
+                        selected[max_budget][i]]
 
     return max_profit, selected_actions
 
