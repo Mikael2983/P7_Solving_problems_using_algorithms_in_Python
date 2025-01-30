@@ -27,7 +27,7 @@ def extract_actions_from_csv(path: str):
         for row in reader:
             action = Action(row[0], row[1], row[2])
             actions.append(action)
-            # cost est utilisé comme indice de table dans la fonction knapsack
+            # cost est utilisé comme indice de table dans la fonction knapsack,
             # il doit donc impérativement être entier
             # Vérifie si un coût non entier est détecté
             if action.cost != int(action.cost):
@@ -46,31 +46,32 @@ def knapsack(actions, max_budget, scale=1):
     :return: Maximum achievable profit and the list of selected actions
     """
 
+    # Convert costs to integers if necessary
     costs = [int(action.cost * scale) for action in actions]
-    profits = [action.cost * action.profitability for action in
-               actions]
+    profits = [action.cost * action.profitability for action in actions]
     max_budget = int(max_budget * scale)
 
-    number_of_actions = len(actions)
-    max_profit_at_budget = [0] * (max_budget + 1)
+    max_profit_table = [[0] * (max_budget + 1) for _ in range(len(actions) + 1)]
 
-    selected = [[False] * number_of_actions for _ in range(
-        max_budget + 1)]  # Tableau pour récupérer les actions choisies
+    for i in range(1, len(actions) + 1):
+        for j in range(max_budget + 1):
+            if costs[i - 1] <= j:
+                max_profit_table[i][j] = max(
+                    max_profit_table[i - 1][j],
+                    max_profit_table[i - 1][j - costs[i - 1]] + profits[i - 1]
+                )
+            else:
+                max_profit_table[i][j] = max_profit_table[i - 1][j]
 
-    for i in range(number_of_actions):
-        for j in range(max_budget, costs[i] - 1, -1):
-            if max_profit_at_budget[j] < max_profit_at_budget[j - costs[i]] + profits[i]:
-                max_profit_at_budget[j] = max_profit_at_budget[j - costs[i]] + profits[i]
-                selected[j] = selected[j - costs[i]][
-                              :]  # Copier la sélection précédente
-                selected[j][i] = True  # Ajouter l'action actuelle
+    budget_remaining = max_budget
+    selected_actions = []
 
-    # Récupération des actions sélectionnées
-    max_profit = max_profit_at_budget[max_budget]
-    selected_actions = [actions[i] for i in range(number_of_actions) if
-                        selected[max_budget][i]]
-
-    return max_profit, selected_actions
+    for i in range(len(actions), 0, -1):
+        if max_profit_table[i][budget_remaining] != max_profit_table[i - 1][budget_remaining]:
+            selected_actions.append(actions[i - 1])
+            budget_remaining -= costs[i - 1]
+    selected_actions.reverse()
+    return max_profit_table[-1][-1], selected_actions
 
 
 def run():
@@ -82,9 +83,12 @@ def run():
 
     print(f"Meilleure rentabilité obtenue : {max_profit:.2f} €")
     print("Actions sélectionnées :")
+    actions_cost = 0
     for action in selected_actions:
+        actions_cost += action.cost
         print(
-            f"- {action.name} (Coût : {action.cost} €, Rentabilité : {action.profitability * 100:.0f}%)")
-
+            f"- {action.name} (Coût : {action.cost} €, Rentabilité : "
+            f"{action.profitability * 100:.0f}%)")
+    print(f"coût total de l'investissement : {actions_cost:.2f} €")
 
 run()
