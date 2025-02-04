@@ -1,7 +1,7 @@
 import csv
 from itertools import combinations
 
-CSV_PATH = "liste_actions.csv"
+CSV_PATH = "data/liste_actions.csv"
 MAX_SPEND = 500
 
 list_actions = []
