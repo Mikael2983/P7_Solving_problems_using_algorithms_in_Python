@@ -1,6 +1,8 @@
 import csv
 
 CSV_PATH = "data/liste_actions.csv"
+
+
 # CSV_PATH = "data/dataset1.csv"
 
 
@@ -38,7 +40,7 @@ def extract_actions_from_csv(path: str):
     return actions, scale
 
 
-def knapsack(actions, max_budget, scale=1):
+def knapsack(actions: list, max_budget: int, scale: int):
     """
     Solves the 0/1 knapsack problem to maximize profitability while respecting
     a budget constraint.
