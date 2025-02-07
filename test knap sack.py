@@ -13,16 +13,14 @@ class Action:
 
 
 def knapsack(max_budget, actions, n, selected_actions):
-    print(f"boucle ${n}")
     # Base Case
     if n == 0 or max_budget == 0:
         return 0, []
 
-    # If weight of the nth item is
-    # more than Knapsack of capacity W,
-    # then this item cannot be included
-    # in the optimal solution
+    # If the cost of the nth action is more than Knapsack of max_budget,
+    # then this item cannot be included in the optimal solution
     if actions[n - 1].cost > max_budget:
+        print(n, actions[n - 1].cost, max_budget )
         return knapsack(max_budget, actions, n - 1, selected_actions)
 
     profit_included, actions_included = knapsack(
@@ -47,7 +45,6 @@ def extract_actions_from_csv(path: str):
     :return: a list of dictionaries of actions with their name, cost and profitability
     """
     actions = []
-    scale = 1  # Valeur par défaut
 
     with open(path, 'r', encoding='utf-8', newline='') as actions_file:
         reader = csv.reader(actions_file)
@@ -57,17 +54,12 @@ def extract_actions_from_csv(path: str):
             if float(row[1])>0:
                 action = Action(row[0], row[1], row[2])
                 actions.append(action)
-                # cost est utilisé comme indice de table dans la fonction knapsack,
-                # il doit donc impérativement être entier
-                # Vérifie si un coût non entier est détecté
-                if action.cost != int(action.cost):
-                    scale = 100  # Active la mise à l'échelle
 
-    return actions, scale
+    return actions
 
 
 def run():
-    actions, scale = extract_actions_from_csv(CSV_PATH)
+    actions = extract_actions_from_csv(CSV_PATH)
 
     max_budget = 500
     n = len(actions)
